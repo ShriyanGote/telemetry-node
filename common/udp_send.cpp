@@ -7,6 +7,8 @@
 #include "packet.h"
 #include "packet_serialization.h"
 #include "test.h"
+#include "udp_socket.h"
+#include "../telemetry_node/TelemetryNode.h"
 
 using namespace std;
 
@@ -20,36 +22,14 @@ size_t serialize_crc(const Packet& packet, uint8_t* buffer){
 
 
 int main(){
-    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0) {
-        cerr << "Error creating socket" << endl;
-        return -1;
-    }
-    sockaddr_in address;
-    address.sin_family = AF_INET;
-    address.sin_port = htons(9000);
-    address.sin_addr.s_addr = INADDR_ANY;
+    UdpSocket socket("127.0.0.1", 9000);
     float voltage_temp = 3.3f;
     static uint32_t sequence_number = 0;
+    TelemetryNode telemetry_node;
 
     cout << "udp sending to port 9000" << endl;
     while (true){
-        Packet packet;
-        packet.magic_number = MAGIC_NUMBER;
-        packet.version = VERSION;
-        packet.payload_len = 0;
-        packet.timestamp_sent = get_current_time();
-        packet.temperature = 123.456f;
-        packet.voltage = voltage_temp;
-        packet.current = 1.25f;
-        packet.sequence_number = sequence_number++;
-        voltage_temp += 0.01f;
-        uint8_t buffer[512];
-        size_t len = serialize_crc(packet, buffer);
-        sendto(sockfd, buffer, len, 0, (const sockaddr*)&address, sizeof(address));
-        cout << "packet sent" << " sequence number: " << packet.sequence_number << endl;
-        sleep(1);
+        telemetry_node.run();
     }
-    close(sockfd);
     return 0;
 }
