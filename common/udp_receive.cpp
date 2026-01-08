@@ -6,8 +6,9 @@
 #include <unistd.h>
 #include "packet.h"
 #include "packet_serialization.h"
-
+#include "test.h"
 using namespace std;
+
 
 
 int main(){
@@ -21,16 +22,32 @@ int main(){
     address.sin_port = htons(9000);
     address.sin_addr.s_addr = INADDR_ANY;
 
+    if (bind(sockfd, (const sockaddr*)&address, sizeof(address)) < 0) {
+        cerr << "Error binding socket" << endl;
+        close(sockfd);
+        return -1;
+    }
+
     cout << "udp listening on port 9000" << endl;
+    static uint32_t last_sequence_number = UINT32_MAX;
     uint8_t buffer[512];
     while (true){
         size_t len = recvfrom(sockfd, buffer, sizeof(buffer), 0, NULL, NULL);
         Packet packet;
-        deserialize_packet(packet, buffer, len);
-        cout << "received packet: " << packet.magic_number << " " << packet.version << " " << packet.payload_len << " " << packet.timestamp << " " << packet.temperature << " " << packet.voltage << " " << packet.current << " " << packet.checksum << endl;
-        close(sockfd);
-        return 0;
+        if (!deserialize_packet(packet, buffer, len)) {
+            cout << "deserialize failed" << endl;
+            continue;
+        }
+        print_packet("packet",packet);
+        
+        if (packet.sequence_number != UINT32_MAX && packet.sequence_number != (last_sequence_number + 1)) {
+            cout << "sequence number mismatch" << " expected: " << last_sequence_number + 1 << " got: " << packet.sequence_number << endl;
+            continue;
+        }
+        last_sequence_number = packet.sequence_number;
+
+        
     }
-
-
+    close(sockfd);
+    return 0;
 }

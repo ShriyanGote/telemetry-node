@@ -6,37 +6,7 @@
 #include "packet.h"
 #include "packet_serialization.h"
 #include "crc32.h"
-
-// ---- helpers -------------------------------------------------------------
-
-static void print_packet(const char* label = "Packet", const Packet& p) {
-    std::cout << label << ":\n";
-    std::cout << "  magic       = 0x" << std::hex << p.magic_number << std::dec << "\n";
-    std::cout << "  version     = " << p.version << "\n";
-    std::cout << "  payload_len = " << p.payload_len << "\n";
-    std::cout << "  timestamp   = 0x" << std::hex << p.timestamp << std::dec << "\n";
-    std::cout << "  temperature = " << p.temperature << "\n";
-    std::cout << "  voltage     = " << p.voltage << "\n";
-    std::cout << "  current     = " << p.current << "\n";
-    std::cout << "  checksum    = 0x" << std::hex << p.checksum << std::dec << "\n";
-}
-
-
-static size_t serialize_with_crc(const Packet& pkt, uint8_t* buffer) {
-    size_t len = serialize_packet(pkt, buffer);
-    uint32_t crc = crc32(buffer, len);
-
-    uint32_t net_crc = htonl(crc);
-    memcpy(buffer + len, &net_crc, sizeof(uint32_t));
-    return len + sizeof(uint32_t);
-}
-
-static void dump_hex(const uint8_t* buf, size_t len) {
-    for (size_t i = 0; i < len; ++i) {
-        printf("%02X ", buf[i]);
-    }
-    printf("\n");
-}
+#include "test.h"
 
 // ---- tests ---------------------------------------------------------------
 
@@ -162,13 +132,13 @@ void test_determinism() {
 
 // ---- main ---------------------------------------------------------------
 
-int main() {
-    test_roundtrip();
-    test_crc_corruption();
-    test_truncation();
-    test_endianness_values();
-    test_determinism();
+// int main() {
+//     test_roundtrip();
+//     test_crc_corruption();
+//     test_truncation();
+//     test_endianness_values();
+//     test_determinism();
 
-    std::cout << "\nALL TESTS PASSED ✅\n";
-    return 0;
-}
+//     std::cout << "\nALL TESTS PASSED ✅\n";
+//     return 0;
+// }

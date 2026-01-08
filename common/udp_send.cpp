@@ -10,6 +10,14 @@
 
 using namespace std;
 
+size_t serialize_crc(const Packet& packet, uint8_t* buffer){
+    size_t len = serialize_packet(packet, buffer);
+    uint32_t crc = crc32(buffer, len);
+    uint32_t net_crc = htonl(crc);
+    memcpy(buffer + len, &net_crc, sizeof(uint32_t));
+    return len + sizeof(uint32_t);
+}
+
 
 int main(){
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -21,19 +29,27 @@ int main(){
     address.sin_family = AF_INET;
     address.sin_port = htons(9000);
     address.sin_addr.s_addr = INADDR_ANY;
+    float voltage_temp = 3.3f;
+    static uint32_t sequence_number = 0;
 
-    cout << "udp listening on port 9000" << endl;
-    
-    uint8_t buffer[512];
+    cout << "udp sending to port 9000" << endl;
     while (true){
-        size_t len = recvfrom(sockfd, buffer, sizeof(buffer), 0, NULL, NULL);
         Packet packet;
-        deserialize_packet(packet, buffer, len);
-        print_packet("packet",packet);
-        close(sockfd);
-
-        return 0;
+        packet.magic_number = MAGIC_NUMBER;
+        packet.version = VERSION;
+        packet.payload_len = 0;
+        packet.timestamp = time(nullptr);
+        packet.temperature = 123.456f;
+        packet.voltage = voltage_temp;
+        packet.current = 1.25f;
+        packet.sequence_number = sequence_number++;
+        voltage_temp += 0.01f;
+        uint8_t buffer[512];
+        size_t len = serialize_crc(packet, buffer);
+        sendto(sockfd, buffer, len, 0, (const sockaddr*)&address, sizeof(address));
+        cout << "packet sent" << " sequence number: " << packet.sequence_number << endl;
+        sleep(1);
     }
-
-
+    close(sockfd);
+    return 0;
 }
