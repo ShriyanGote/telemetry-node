@@ -57,7 +57,7 @@ size_t serialize_packet(const Packet &packet, uint8_t *buffer) {
     write_uint32_t(buffer, &offset, packet.magic_number);
     write_uint32_t(buffer, &offset, packet.version);
     write_uint32_t(buffer, &offset, packet.payload_len);
-    write_uint64_t(buffer, &offset, packet.timestamp);
+    write_uint64_t(buffer, &offset, packet.timestamp_sent);
     write_uint32_t(buffer, &offset, packet.sequence_number);
     write_float(buffer, &offset, packet.temperature);
     write_float(buffer, &offset, packet.voltage);
@@ -74,7 +74,7 @@ bool deserialize_packet(Packet &packet, const uint8_t *buffer, size_t size) {
     packet.magic_number = read_uint32_t(buffer, &offset);
     packet.version = read_uint32_t(buffer, &offset);
     packet.payload_len = read_uint32_t(buffer, &offset);
-    packet.timestamp = read_uint64_t(buffer, &offset);
+    packet.timestamp_sent = read_uint64_t(buffer, &offset);
     packet.sequence_number = read_uint32_t(buffer, &offset);
     packet.temperature = read_float(buffer, &offset);
     packet.voltage = read_float(buffer, &offset);

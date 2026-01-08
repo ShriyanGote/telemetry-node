@@ -21,7 +21,7 @@ struct Packet {
     uint32_t version;
     uint32_t payload_len;
     uint32_t sequence_number;
-    uint64_t timestamp;
+    uint64_t timestamp_sent;
     float temperature;
     float voltage;
     float current;

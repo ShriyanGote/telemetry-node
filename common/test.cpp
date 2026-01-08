@@ -17,7 +17,7 @@ void test_roundtrip() {
     in.magic_number = MAGIC_NUMBER;
     in.version = VERSION;
     in.payload_len = 0;
-    in.timestamp = 0x1122334455667788ULL;
+    in.timestamp_sent= 0x1122334455667788ULL;
     in.temperature = 123.456f;
     in.voltage = 3.3f;
     in.current = 1.25f;
@@ -37,7 +37,7 @@ void test_roundtrip() {
 
     assert(out.magic_number == in.magic_number);
     assert(out.version == in.version);
-    assert(out.timestamp == in.timestamp);
+    assert(out.timestamp_sent== in.timestamp_sent);
     assert(out.temperature == in.temperature);
     assert(out.voltage == in.voltage);
     assert(out.current == in.current);
@@ -91,7 +91,7 @@ void test_endianness_values() {
     Packet pkt{};
     pkt.magic_number = 0x01020304;
     pkt.version = 0xAABBCCDD;
-    pkt.timestamp = 0x1122334455667788ULL;
+    pkt.timestamp_sent= 0x1122334455667788ULL;
     pkt.temperature = -273.15f;
     pkt.voltage = 12345.678f;
     pkt.current = 0.0001f;
@@ -105,7 +105,7 @@ void test_endianness_values() {
 
     assert(out.magic_number == pkt.magic_number);
     assert(out.version == pkt.version);
-    assert(out.timestamp == pkt.timestamp);
+    assert(out.timestamp_sent== pkt.timestamp_sent);
     assert(out.temperature == pkt.temperature);
     assert(out.voltage == pkt.voltage);
     assert(out.current == pkt.current);
@@ -117,7 +117,7 @@ void test_determinism() {
     Packet pkt{};
     pkt.magic_number = MAGIC_NUMBER;
     pkt.version = VERSION;
-    pkt.timestamp = 42;
+    pkt.timestamp_sent= 42;
     pkt.temperature = 1.0f;
     pkt.voltage = 2.0f;
     pkt.current = 3.0f;

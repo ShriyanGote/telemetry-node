@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include "packet.h"
 #include "packet_serialization.h"
-#include "test.cpp"
+#include "test.h"
 
 using namespace std;
 
@@ -38,7 +38,7 @@ int main(){
         packet.magic_number = MAGIC_NUMBER;
         packet.version = VERSION;
         packet.payload_len = 0;
-        packet.timestamp = time(nullptr);
+        packet.timestamp_sent = get_current_time();
         packet.temperature = 123.456f;
         packet.voltage = voltage_temp;
         packet.current = 1.25f;

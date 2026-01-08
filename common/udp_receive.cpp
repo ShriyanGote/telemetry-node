@@ -44,6 +44,13 @@ int main(){
             cout << "sequence number mismatch" << " expected: " << last_sequence_number + 1 << " got: " << packet.sequence_number << endl;
             continue;
         }
+        uint64_t current_time = get_current_time();
+        uint32_t latency = current_time - packet.timestamp_sent;
+        double latency_ms = latency / 1000000.0;
+        cout << "current time: " << current_time << endl;
+        cout << "packet timestamp sent: " << packet.timestamp_sent << endl;
+        cout << "latency: " << latency_ms << " ms" << endl;
+
         last_sequence_number = packet.sequence_number;
 
         
